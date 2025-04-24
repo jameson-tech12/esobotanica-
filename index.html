@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Entèlijan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #3e3ede;
+            min-width: 500px;
+        }        
+
+        /* Ikon chatbot */
+        .chatbot-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #3e3ede;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .chatbot-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-icon i {
+            font-size: 24px;
+        }
+
+        /* Chatbot kontnè */
+        .chatbot-container {
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 1000;
+            transform: scale(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s;
+            opacity: 0;
+        }
+
+        .chatbot-container.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .chatbot-header {
+            background-color: #3e3ede;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .close-chatbot {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .bot-message, .user-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+            font-size: 14px;
+        }
+
+        .bot-message {
+            background-color: #e3f2fd;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        .user-message {
+            background-color: #4a6fa5;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chatbot-input button {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Fòmilè achte */
+        .purchase-form-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .purchase-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .account-info {
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .product-display {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-display img {
+            max-width: 100%;
+            max-height: 150px;
+            margin-bottom: 10px;
+        }
+
+        .payment-methods div {
+            margin: 5px 0;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .submit-btn, .cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background-color: #3e3ede;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Notifikasyon */
+        .notification {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #3e3ede;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: none;
+            max-width: 300px;
+            animation: fadeInOut 5s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Lang selector */
+        .lang-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .lang-btn {
+            padding: 5px 10px;
+            background-color: #3e3ede;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        header {
+        top: 0;
+            position: fixed;
+            width: 100%;
+            height: 70px;
+            background: linear-gradient(to top, #111, #3e3ede, #111);
+    display: flex;
+            justify-content: space-evenly;
+            align-items: center;        
+            font-size: 1.5em;
+            color: white;
+            }
+            
+        .oeil {
+            width: 50px;
+            height: 50px;
+         border-radius: 50%;
+             }
+             
+                .bouji {
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(to right, #d3a15f, #f5d6a3, #d3a15f);
+            margin: 50px auto;
+            position: relative;
+            border-radius: 5px;
+        }
+        
+        .flam {
+            width: 30px;
+            height: 60px;
+            background: linear-gradient(to top, #ff7800, #ffdc00, white);
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: -60px;
+            left: 0;
+            box-shadow: 0 0 20px #ff6600, 0 0 40px #ffaa00;
+            animation: souke 0.5s infinite alternate ease-in-out;
+            transform-origin: bottom center;
+        }
+        
+        @keyframes souke {
+            0%, 100% {
+                transform: rotate(-3deg);
+            }
+            50% {
+                transform: rotate(3deg);
+            }
+        }
+      
+        
+        .lampe {
+        position: fixed;
+        left: 15px; 
+        bottom: 60px; 
+            width: 150px;
+            height: 150px;
+            padding: 30px;
+            background: rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+        }   
+        
+        footer {
+        position: fixed;
+        bottom: 0;
+        color: white;
+        font-size: 0.5em;
+            width: 100%;
+            height: 70px;
+            background: linear-gradient(to top, #111, #3e3ede, #111);
+            line-height: 1.5;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;           
+        }
+        
+        .line {
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to top, #111, #3e3ede, #111);   
+        }
+        
+        .kouzen {
+            border-radius: 50%;
+        }
+        
+        .box {
+        color: red;
+            width: 100%;
+            height: 300px;
+            background-color: white;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        .freda {
+           width: 350px;
+           height: auto;
+           border-radius: 50%; 
+           margin-top: 30px
+        }
+        
+        .fond-image1 {
+            width: 400px;
+            height: 270px;
+            background-color: #3e3ede;
+            border-radius: 50% 0 50% 0;
+            padding: 5px;
+            margin-top: 40px;
+        } 
+             .container1 {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 600px;
+            margin: 10px auto;
+            padding: 20px;
+            background-color: #eee;
+            border-radius: 15% 0 0 0;
+        }
+        
+        .text-gauche {
+            width: 48%;
+        }
+        
+        .image-droit {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .imaj-bò img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .kontnè {
+                flex-direction: column;
+            }
+            
+            .tèks-bò, .imaj-bò {
+                width: 100%;
+            }
+        
+              /* Menu 3 ba (trip ba) pou mobil */
+        .menu-tripba {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .ba {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+        }
+        
+        /* Navigasyon prensipal la */
+        .nav {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav li {
+            margin-left: 2rem;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+        
+        .nav a:hover {
+            color: #f39c12;
+        }
+        
+        /* Lè menu a aktive (pou mobil) */
+        .nav.aktive {
+            display: flex;
+        }
+        
+        /* Lè trip ba a aktive */
+        .menu-tripba.aktive .ba:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .menu-tripba.aktive .ba:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-tripba.aktive .ba:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        
+        /* Responsive - Lè ekran an piti */
+        @media (max-width: 768px) {
+            .menu-tripba {
+                display: flex;
+            }
+            
+            .nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                background-color: (255, 0, 0, 0.7);                          
+            }
+            
+            .nav li {
+                margin: 0;
+                padding: 0.5rem 1rem;
+                text-align: center;
+            }
+            
+            .nav li:hover {
+background-color: #3e3ede;
+            }
+    </style>
+</head>
+<body>
+    
+    <header>
+        Eso-Botanica
+        <img class="oeil" src="oeil.png" alt="oeil">
+           <!-- Menu trip ba (3 ba) -->
+            <div class="menu-tripba" id="menuTripBa">
+                <div class="ba"></div>
+                <div class="ba"></div>
+                <div class="ba"></div>
+            </div>
+            
+            <!-- Meni navigasyon an -->
+            <ul class="nav" id="navMenu">
+                <li><a href="#">Akèy</a></li>
+                <li><a href="#">Sèvis</a></li>
+                <li><a href="#">Pwojè</a></li>
+                <li><a href="#">Kontak</a></li>
+                <li><a href="#">Konekte</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <div class="fond-img">
+        <div class="box">
+            <center>
+            <h1>Produits<br>
+            De<br>
+            Qualité<br>
+            </h1>
+            </center>
+            <div class="fond-image1">
+            <img class="freda" src="jolie.png" alt="freda">
+            </div>
+    </div>
+    </div>
+    <hr class="line">
+    <marquee><p style="color: #fff; font-size: 1.2em;">Acheter en toute sécurité sur notre site web. Notre assistance virtuelle est là pour vous guider. Cliquer sur l'icône au coin inferieur de l'écran pour commencer une conversation...</p></marquee>
+    </hr>
+        
+        <div class="lampe">
+         <div class="bouji">          
+            <div class="flam"></div>
+            </div>
+        </div>
+        <div class="container1">
+            <div class="text-gauch">
+        <center><h2>Propos de Bienvenue</h2></center>
+        <p>
+        Bienvenue dans l’Antre des Mystères – Votre Boutique Mystique en Ligne</p>
+
+<p>Cher voyageur des énergies invisibles,</p>
+<p>
+Nous sommes ravis de vous accueillir dans notre sanctuaire en ligne, où chaque objet est imprégné de magie, de symboles anciens et de vibrations uniques. Que vous soyez en quête de sagesse, de protection ou simplement d’une étincelle de merveilleux, vous êtes au bon endroit.</p> 
+
+<p>Comment pouvons-nous vous guider ?</p>
+<p>
+- Découvrez nos artefacts énigmatiques (pierres, tarots, bougies, encens, etc.) grâce à notre assistance.  
+</p>
+<p>
+- Visualisez leurs images et leurs prix en un instant. 
+</p> 
+<p>
+- Passez commande en toute simplicité, comme par enchantement.
+</p>  
+<p>
+"Le monde est plein de choses invisibles, attendant d’être révélées..." Laissez-nous vous aider à trouver celle qui vous appelle.</p>
+
+<p>Par où commencer votre voyage</p>
+</div>
+<div class="image-droite">
+    <img class ="kouzen" src="kouzen.jpg" alt="kouzen">
+    <img class ="kouzen" src="freda.jpeg" alt="freda">
+    <img class="kouzen" src="dantò.jpeg" alt="dantò">
+</div>
+    </div>
+    
+    <!-- Ikon chatbot -->
+    <div class="chatbot-icon" id="chatbot-icon">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Chatbot kontnè -->
+    <div class="chatbot-container" id="chatbot-container">
+        <div class="chatbot-header">
+            <h3>Barrais</h3>
+        <button class="close-chatbot" id="close-chatbot">
+            <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="bot-message">
+                <p>Bonjou! Mwen se Barrais. Mwen ka pale an Kreyòl, Franse, Panyòl ak Anglè. Ki lang ou prefere?</p>
+                <div class="lang-options">
+                    <button class="lang-btn" data-lang="ht">Kreyòl</button>
+                    <button class="lang-btn" data-lang="fr">Français</button>
+                    <button class="lang-btn" data-lang="es">Español</button>
+                    <button class="lang-btn" data-lang="en">English</button>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="user-input" placeholder="Ekri mesaj ou la...">
+            <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Fòmilè achte -->
+    <div class="purchase-form-container" id="purchase-form-container">
+        <div class="purchase-form">
+            <h3>Fòmilè Kòmann</h3>
+            <div class="account-info">
+                <p><strong>Non Kont:</strong> BARRAIS Jameson</p>
+                <p><strong>Nimewo Kont:</strong> 4443-5143 / 5576-9797</p>
+            </div>
+            <form action="https://formsubmit.co/mybusyness1986@gmail.com" id="purchase-form" method="POST">
+                <div class="form-group">
+                    <label for="full-name">Non Konplè:</label>
+                    <input type="text" id="full-name" required>
+                    </div>
+                    <div class="form-group">
+                    <label for="adrès">Adrès</label>
+                    <input type="text" id="adrès" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-image">Pwodwi:</label>
+                    <div class="product-display" id="product-display">
+                        <!-- Imaj pwodwi a pral parèt isit la -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Kantite:</label>
+                    <input type="number" id="quantity" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="unit-price">Pri Inite:</label>
+                    <input type="number" id="unit-price" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="total-price">Pri Total:</label>
+                    <input type="number" id="total-price" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Nimewo Telefòn:</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-id">ID Tranzaksyon:</label>
+                    <input type="text" id="transaction-id" required>
+                </div>
+                <div class="form-group payment-methods">
+                    <label>Mòd Pèman:</label>
+                    <div>
+                        <input type="checkbox" id="moncash" name="payment" value="MonCash">
+                        <label for="moncash">MonCash</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="natcash" name="payment" value="NatCash">
+                        <label for="natcash">NatCash</label>
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="submit-btn">Soumèt</button>
+                    <button type="button" class="cancel-btn" id="cancel-purchase">Anile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotIcon = document.getElementById('chatbot-icon');
+            const chatbotContainer = document.getElementById('chatbot-container');
+            const closeChatbot = document.getElementById('close-chatbot');
+            const messagesContainer = document.getElementById('chatbot-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const purchaseFormContainer = document.getElementById('purchase-form-container');
+            const purchaseForm = document.getElementById('purchase-form');
+            const cancelPurchaseBtn = document.getElementById('cancel-purchase');
+            const productDisplay = document.getElementById('product-display');
+            const quantityInput = document.getElementById('quantity');
+            const unitPriceInput = document.getElementById('unit-price');
+            const totalPriceInput = document.getElementById('total-price');
+            
+            let currentLanguage = 'ht'; // Default language (Haitian Creole)
+            let currentProduct = null;
+            let notificationTimeout;
+            let hasShownNotification = false;
+            
+            // Sample products
+            const products = {
+                'florida': {
+                    name: {
+                        'ht': 'florida',
+                        'fr': 'florida',
+                        'es': 'florida',
+                        'en': 'florida',
+                    },
+                    price: 1000,
+                    image: 'florida.jpeg'
+                },
+                'rêve dor': {
+                    name: {
+                        'ht': 'rêve dor',
+                        'fr': 'rêve dor',
+                        'es': 'rêve dor',
+                        'en': 'rêve dor',
+                    },
+                    price: 750,
+                    image: 'revedor.jpeg'
+                },
+                'bienêtre': {
+                    name: {
+                        'ht': 'bienêtre',
+                        'fr': 'bienêtre',
+                        'es': 'bienêtre',
+                        'en': 'bienêtre',
+                    },
+                    price: 2000,
+                    image: 'bienêtre.jpeg'
+                },
+                
+                'ponpeia': {
+                  name: {
+                        'ht': 'ponpeia',
+                        'fr': 'ponpeia',
+                        'es': 'ponpeia',
+                        'en': 'ponpeia',
+                    },
+                    price: 750,
+                    image: 'ponpeia.jpeg'
+                },
+                 'encens': {
+                  name: {
+                        'ht': 'encens',
+                        'fr': 'ensens',
+                        'es': 'encens',
+                        'en': 'encens',
+                    },
+                    price: 1000,
+                    image: 'encens.jpeg'
+                },
+                 'balèn': {
+                  name: {
+                        'ht': 'balèn',
+                        'fr': 'bougie',
+                        'es': 'vela',
+                        'en': 'candle',
+                    },
+                    price: 400,
+                    image: 'bougie.jpeg'
+                },
+                 'kolibri': {
+                  name: {
+                        'ht': 'kolibri',
+                        'fr': 'colibri',
+                        'es': 'colibri',
+                        'en': 'colibri',
+                    },
+                    price: 550,
+                    image: 'colibri.jpeg'
+                },
+                  'hombre': {
+                  name: {
+                        'ht': 'hombre',
+                        'fr': 'hombre',
+                        'es': 'hombre',
+                        'en': 'hombre',
+                    },
+                    price: 1000,
+                    image: 'hombre.jpeg'
+               
+                },
+                'lanpyon': {
+                  name: {
+                        'ht': 'lanpyon',
+                        'fr': 'lampion',
+                        'es': 'lampion',
+                        'en': 'lampion',
+                    },
+                    price: 125,
+                    image: 'lampion.jpeg'
+                }
+            };
+            
+            // Sample cartomancy predictions
+            const cartomancyPredictions = {
+                'love': {
+                    'ht': 'Mwen wè yon bèl relasyon amoure nan lavni ou. Ou pral rankontre yon moun espesyal nan pwochen 3 mwa yo.',
+                    'fr': 'Je vois une belle relation amoureuse dans votre avenir. Vous rencontrerez une personne spéciale dans les 3 prochains mois.',
+                    'es': 'Veo una hermosa relación amorosa en tu futuro. Conocerás a alguien especial en los próximos 3 meses.',
+                    'en': 'I see a beautiful love relationship in your future. You will meet someone special in the next 3 months.'
+                },
+                'work': {
+                    'ht': 'Travay ou pral amelyore. Ou pral jwenn yon bèl opòtinite nan pwochen 2 mwa yo.',
+                    'fr': 'Votre travail va s\'améliorer. Vous aurez une belle opportunité dans les 2 prochains mois.',
+                    'es': 'Tu trabajo mejorará. Tendrás una gran oportunidad en los próximos 2 meses.',
+                    'en': 'Your work will improve. You will get a great opportunity in the next 2 months.'
+                },
+                'health': {
+                    'ht': 'Fòk ou pran swen sante ou. Pran yon ti repo epi evite estrès.',
+                    'fr': 'Vous devez prendre soin de votre santé. Prenez un peu de repos et évitez le stress.',
+                    'es': 'Debes cuidar tu salud. Tómate un descanso y evita el estrés.',
+                    'en': 'You need to take care of your health. Take some rest and avoid stress.'
+                },
+                'general': {
+                    'ht': 'Mwen wè yon bèl chans kap vini nan direksyon ou. Kenbe la!',
+                    'fr': 'Je vois une bonne chance venir vers vous. Continuez!',
+                    'es': 'Veo buena suerte viniendo hacia ti. ¡Sigue adelante!',
+                    'en': 'I see good luck coming your way. Keep it up!'
+                }
+            };
+            
+            // Initialize chatbot
+            function initChatbot() {
+                // Set up event listeners for language buttons
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        currentLanguage = this.getAttribute('data-lang');
+                        addBotMessage(getTranslation('language_set', currentLanguage));
+                    });
+                });
+                
+                // Show notification when page loads
+                showNotificationOnLoad();
+            }
+            
+            // Show notification when page loads and chatbot is closed
+            function showNotificationOnLoad() {
+                if (!hasShownNotification) {
+                    setTimeout(() => {
+                        if (!chatbotContainer.classList.contains('active')) {
+                            showNotification();
+                        }
+                        hasShownNotification = true;
+                    }, 10000);
+                }
+            }
+            
+            // Show notification when chatbot is closed
+            function showNotificationOnClose() {
+                if (!chatbotContainer.classList.contains('active')) {
+                    showNotification();
+                }
+            }
+            
+            // Show a notification
+            function showNotification() {
+                const notifications = [
+                    getTranslation('notification1', currentLanguage),
+                    getTranslation('notification2', currentLanguage),
+                    getTranslation('notification3', currentLanguage),
+                    getTranslation('notification4', currentLanguage)
+                ];
+                
+                const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+                
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = randomNotification;
+                document.body.appendChild(notification);
+                
+                // Show notification with animation
+                setTimeout(() => {
+                    notification.style.display = 'block';
+                }, 100);
+                
+                // Hide after animation completes (5 seconds)
+                setTimeout(() => {
+                    notification.remove();
+                }, 10000);
+            }
+            
+            // Get translation based on language
+            function getTranslation(key, lang) {
+                const translations = {
+                    'language_set': {
+                        'ht': 'Mwen pral pale avèk ou an Kreyòl kounye a.',
+                        'fr': 'Je vais maintenant parler avec vous en français.',
+                        'es': 'Ahora hablaré contigo en español.',
+                        'en': 'I will now speak with you in English.'
+                    },
+                    'greeting': {
+                        'ht': 'Bonjou! Kijan mwen ka ede w jodi a?',
+                        'fr': 'Bonjour! Comment puis-je vous aider aujourd\'hui?',
+                        'es': '¡Hola! ¿Cómo puedo ayudarte hoy?',
+                        'en': 'Hello! How can I help you today?'
+                    },
+                    'product_question': {
+                        'ht': 'Ki pwodwi ou ta renmen wè?',
+                        'fr': 'Quel produit souhaitez-vous voir?',
+                        'es': '¿Qué producto te gustaría ver?',
+                        'en': 'Which product would you like to see?'
+                    },
+                    'product_not_found': {
+                        'ht': 'Mwen pa jwenn pwodwi sa a. Tanpri eseye yon lòt.',
+                        'fr': 'Je ne trouve pas ce produit. Veuillez en essayer un autre.',
+                        'es': 'No encuentro ese producto. Por favor intente con otro.',
+                        'en': 'I can\'t find that product. Please try another one.'
+                    },
+                    'cartomancy_prompt': {
+                        'ht': 'Pou vwayans mistik, di m sou ki sijè ou vle m pale  (lanmou, travay, sante, oswa jeneral).',
+                        'fr': 'Pour une cartomancie, dites-moi sur quel sujet vous voulez que je parle (amour, travail, santé ou général).',
+                        'es': 'Para una cartomancia, dime sobre qué tema quieres que hable (amor, trabajo, salud o general).',
+                        'en': 'For cartomancy, tell me what topic you want me to talk about (love, work, health, or general).'
+                    },
+                    'purchase_prompt': {
+                        'ht': 'Èske ou ta renmen achte pwodwi sa a?',
+                        'fr': 'Souhaitez-vous acheter ce produit?',
+                        'es': '¿Te gustaría comprar este producto?',
+                        'en': 'Would you like to purchase this product?'
+                    },
+                    'thanks_no_purchase': {
+                        'ht': 'Mèsi pou enterè ou. Nou espere w ap vizite sit nou an ankò!',
+                        'fr': 'Merci pour votre intérêt. Nous espérons que vous visiterez à nouveau notre site!',
+                        'es': 'Gracias por tu interés. ¡Esperamos que visites nuestro sitio nuevamente!',
+                        'en': 'Thank you for your interest. We hope you visit our site again!'
+                    },
+                    'thanks_purchase': {
+                        'ht': 'Mèsi pou achte ou! Nou pral kontakte ou talè pou konfime kòmand ou an.',
+                        'fr': 'Merci pour votre achat! Nous vous contacterons bientôt pour confirmer votre commande.',
+                        'es': '¡Gracias por su compra! Nos pondremos en contacto con usted pronto para confirmar su pedido.',
+                        'en': 'Thank you for your purchase! We will contact you soon to confirm your order.'
+                    },
+                    'notification1': {
+                        'ht': '💫 Nouvo pwodwi mystic disponib! Klike sou icon chatbot la pou w wè yo.',
+                        'fr': '💫 Nouveaux produits mystiques disponibles! Cliquez sur l\'icône du chatbot pour les voir.',
+                        'es': '💫 ¡Nuevos productos místicos disponibles! Haz clic en el icono del chatbot para verlos.',
+                        'en': '💫 New mystic products available! Click the chatbot icon to see them.'
+                    },
+                    'notification2': {
+                        'ht': '🔮 Èske ou konnen sa kap tann ou nan lavni? Klike sou chatbot la pou yon vwayan gratis!',
+                        'fr': '🔮 Savez-vous ce que l\'avenir vous réserve? Cliquez sur le chatbot pour une cartomancie gratuite!',
+                        'es': '🔮 ¿Sabes lo que te depara el futuro? ¡Haz clic en el chatbot para una cartomancia gratis!',
+                        'en': '🔮 Do you know what the future holds for you? Click the chatbot for a free reading!'
+                    },
+                    'notification3': {
+                        'ht': '✨ Eksklizif! Jodi a sèlman - 15% rabè sou tout pwodwi divinasyon yo.',
+                        'fr': '✨ Exclusif! Aujourd\'hui seulement - 15% de réduction sur tous les produits de divination.',
+                        'es': '✨ ¡Exclusivo! Solo por hoy - 15% de descuento en todos los productos de adivinación.',
+                        'en': '✨ Exclusive! Today only - 15% off all divination products.'
+                    },
+                    'notification4': {
+                        'ht': '👋 Pa bliye konsilte chatbot nou an pou tout kesyon ou genyen! Nou la pou ede ou.',
+                        'fr': '👋 N\'oubliez pas de consulter notre chatbot pour toutes vos questions! Nous sommes là pour vous aider.',
+                        'es': '👋 ¡No olvides consultar nuestro chatbot para cualquier pregunta! Estamos aquí para ayudarte.',
+                        'en': '👋 Don\'t forget to consult our chatbot for any questions! We\'re here to help.'
+                    }
+                };
+                
+                return translations[key][lang] || translations[key]['ht'];
+            }
+            
+            // Add a message from the user to the chat
+            function addUserMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'user-message';
+                messageDiv.innerHTML = `<p>${message}</p>`;
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Add a message from the bot to the chat
+            function addBotMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'bot-message';
+                messageDiv.innerHTML = `<p>${message}</p>`;
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Process user input
+            function processUserInput() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+                
+                addUserMessage(message);
+                userInput.value = '';
+                
+                // Check for language change
+                if (message.toLowerCase().includes('english') || message.toLowerCase().includes('anglais') || message.toLowerCase().includes('inglés')) {
+                    currentLanguage = 'en';
+                    addBotMessage(getTranslation('language_set', currentLanguage));
+                    return;
+                } else if (message.toLowerCase().includes('français') || message.toLowerCase().includes('french') || message.toLowerCase().includes('francés')) {
+                    currentLanguage = 'fr';
+                    addBotMessage(getTranslation('language_set', currentLanguage));
+                    return;
+                } else if (message.toLowerCase().includes('español') || message.toLowerCase().includes('spanish') || message.toLowerCase().includes('espagnol')) {
+                    currentLanguage = 'es';
+                    addBotMessage(getTranslation('language_set', currentLanguage));
+                    return;
+                } else if (message.toLowerCase().includes('kreyòl') || message.toLowerCase().includes('creole') || message.toLowerCase().includes('créole')) {
+                    currentLanguage = 'ht';
+                    addBotMessage(getTranslation('language_set', currentLanguage));
+                    return;
+                }
+                
+                // Check for product request
+                const productKeys = Object.keys(products);
+                for (const key of productKeys) {
+                    if (message.toLowerCase().includes(key)) {
+                        currentProduct = products[key];
+                        showProduct(currentProduct);
+                        return;
+                    }
+                }
+                
+                // Check for cartomancy request
+                if (message.toLowerCase().includes('vwayans') || message.toLowerCase().includes('cartomancie') || message.toLowerCase().includes('cartomancia') || message.toLowerCase().includes('prediction')) {
+                    addBotMessage(getTranslation('cartomancy_prompt', currentLanguage));
+                    return;
+                }
+                
+                // Check for cartomancy topic
+                if (message.toLowerCase().includes('lanmou') || message.toLowerCase().includes('amour') || message.toLowerCase().includes('amor') || message.toLowerCase().includes('love')) {
+                    addBotMessage(cartomancyPredictions['love'][currentLanguage]);
+                    return;
+                } else if (message.toLowerCase().includes('travay') || message.toLowerCase().includes('travail') || message.toLowerCase().includes('trabajo') || message.toLowerCase().includes('work')) {
+                    addBotMessage(cartomancyPredictions['work'][currentLanguage]);
+                    return;
+                } else if (message.toLowerCase().includes('sante') || message.toLowerCase().includes('santé') || message.toLowerCase().includes('salud') || message.toLowerCase().includes('health')) {
+                    addBotMessage(cartomancyPredictions['health'][currentLanguage]);
+                    return;
+                } else if (message.toLowerCase().includes('jeneral') || message.toLowerCase().includes('général') || message.toLowerCase().includes('general')) {
+                    addBotMessage(cartomancyPredictions['general'][currentLanguage]);
+                    return;
+                }
+                
+                // Check if user wants to buy
+                if (message.toLowerCase().includes('wi') || message.toLowerCase().includes('oui') || message.toLowerCase().includes('yes') || message.toLowerCase().includes('sí')) {
+                    if (currentProduct) {
+                        purchaseFormContainer.style.display = 'flex';
+                    } else {
+                        addBotMessage(getTranslation('product_not_found', currentLanguage));
+                    }
+                    return;
+                }
+                
+                // Check if user doesn't want to buy
+                if (message.toLowerCase().includes('non') || message.toLowerCase().includes('no')) {
+                    addBotMessage(getTranslation('thanks_no_purchase', currentLanguage));
+                    return;
+                }
+                
+                // Default response
+                setTimeout(() => {
+                    addBotMessage(getTranslation('greeting', currentLanguage));
+                    addBotMessage(getTranslation('product_question', currentLanguage));
+                }, 1000);
+            }
+            
+            // Show product information
+            function showProduct(product) {
+                productDisplay.innerHTML = `
+                    <img src="${product.image}" alt="${product.name[currentLanguage]}">
+                    <p><strong>${product.name[currentLanguage]}</strong></p>
+                    <p>Pri: ${product.price} HTG</p>
+                `;
+                
+                unitPriceInput.value = product.price;
+                calculateTotal();
+                
+                addBotMessage(`${product.name[currentLanguage]} - ${product.price} HTG`);
+                addBotMessage(getTranslation('purchase_prompt', currentLanguage));
+            }
+            
+            // Calculate total price
+            function calculateTotal() {
+                const quantity = parseInt(quantityInput.value) || 1;
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                const total = quantity * unitPrice;
+                totalPriceInput.value = total.toFixed(2);
+            }
+            
+            // Toggle chatbot visibility
+            function toggleChatbot() {
+                chatbotContainer.classList.toggle('active');
+                
+                if (!chatbotContainer.classList.contains('active')) {
+                    // When closing chatbot, show notification after a delay
+                    setTimeout(showNotificationOnClose, 30000); // 30 seconds after closing
+                } else {
+                    // When opening chatbot, clear any pending notification
+                    clearTimeout(notificationTimeout);
+                }
+            }
+            
+            // Event listeners
+            chatbotIcon.addEventListener('click', toggleChatbot);
+            closeChatbot.addEventListener('click', toggleChatbot);
+            
+            sendButton.addEventListener('click', processUserInput);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    processUserInput();
+                }
+            });
+            
+            quantityInput.addEventListener('change', calculateTotal);
+            quantityInput.addEventListener('input', calculateTotal);
+            
+            cancelPurchaseBtn.addEventListener('click', function() {
+                purchaseFormContainer.style.display = 'none';
+                addBotMessage(getTranslation('thanks_no_purchase', currentLanguage));
+            });
+            
+            purchaseForm.addEventListener('submit', function(e) {
+                
+                // Here you would normally send the form data to your email service
+                // For this example, we'll just show a confirmation message
+                
+                const formData = {
+                    fullName: document.getElementById('full-name').value,
+                    product: currentProduct.name[currentLanguage],
+                    quantity: quantityInput.value,
+                    unitPrice: unitPriceInput.value,
+                    totalPrice: totalPriceInput.value,
+                    phone: document.getElementById('phone').value,
+                    transactionId: document.getElementById('transaction-id').value,
+                    paymentMethod: document.querySelector('input[name="payment"]:checked')?.value || 'None'
+                };
+                
+                console.log('Form submitted:', formData); // For demonstration
+                
+                // Show confirmation
+                addBotMessage(getTranslation('thanks_purchase', currentLanguage));
+                
+                // Reset form
+                purchaseForm.reset();
+                purchaseFormContainer.style.display = 'none';
+            });
+            
+            // Initialize the chatbot
+            initChatbot ('aktive');
+        });
+            
+             // JavaScript pou fè menu trip ba a fonksyone
+        const menuTripBa = document.getElementById('menuTripBa');
+        const navMenu = document.getElementById('navMenu');
+        
+        menuTripBa.addEventListener('click', () => {
+            menuTripBa.classList.toggle('aktive');
+            navMenu.classList.toggle('aktive');
+        });
+    </script>
+    <footer>
+        ® Tout droits reservés<br>
+        barrais89@gmail.com<br>
+        Tél: +509 44435143<br>
+        
+    </footer>
+</body>
+</html>
